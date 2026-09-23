@@ -6,6 +6,9 @@ public abstract class PrintJob implements Chargeable {
     private int pages;
 
     public PrintJob(String id, int pages) { //constructor untuk menginisialisasi id dan pages
+        if (pages <= 0) {
+            throw new IllegalArgumentException("Pages cannot be positive number");
+        }
         this.id = id;
         this.pages = pages;
     }
@@ -20,6 +23,12 @@ public abstract class PrintJob implements Chargeable {
 
     @Override
     public abstract int calculateCharge(); //method abstract karena setiap jenis print job akan memiliki cara perhitungan biaya yang berbeda
+    public int calculateCharge(int copies){
+        if (copies <= 0) {
+            throw new IllegalArgumentException("Copies cannot be non-positive number");
+        }
+        return copies * calculateCharge();
+    }
 
     public String label() { //method untuk menampilkan informasi tentang print job
         return "Print"; //induk dari semua jenis print job adalah "Print"
