@@ -1,13 +1,14 @@
 package lw01.unguided;
 
+import java.io.File;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         WashService[] services = new WashService[30];
         int jumlahServices = 0;
 
-        Scanner baca = new Scanner(Main.class.getResourceAsStream("washes.txt"));
+        Scanner baca = new Scanner(new File("src/lw01/unguided/washes.txt"));
         int i = baca.nextInt();
         for (int j = 0; j < i; j++) {
             String type = baca.next();
