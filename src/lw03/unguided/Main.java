@@ -8,11 +8,11 @@ public class Main {
     public static void main(String[] args) {
         
         Scanner read = new Scanner(Main.class.getResourceAsStream("registration.txt"));
-        Set<String> terdaftar = new HashSet<>();
+        Set<String> studentRegistered = new HashSet<>();
 
         while (read.hasNext()) {
             String id = read.next();
-            terdaftar.add(id); 
+            studentRegistered.add(id); 
         }
         read.close();
 
