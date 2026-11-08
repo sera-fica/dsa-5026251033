@@ -1,67 +1,71 @@
-import java.util.Scanner;
+package lw04.prelab;
+
+import java.util.*;
 
 public class Main {
-    public static void insertionSort(int[] arr, int passes) {
-        int n = arr.length;
 
-        for (int i = 1; i <= passes && i < n; i++) {
-            int key = arr[i];
+    public static void insertionSort(int[] data, int jumlahPass) {
+        int panjang = data.length;
+
+        for (int i = 1; i <= jumlahPass && i < panjang; i++) {
+            int kunci = data[i];
             int j = i - 1;
 
-            while (j >= 0 && arr[j] < key) {
-                arr[j + 1] = arr[j];
+            while (j >= 0 && data[j] < kunci) {
+                data[j + 1] = data[j];
                 j--;
             }
 
-            arr[j + 1] = key;
+            data[j + 1] = kunci;
         }
     }
 
-    public static int linearSearch(int[] arr, int target) {
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] == target) {
+    public static int linearSearch(int[] data, int target) {
+        for (int i = 0; i < data.length; i++) {
+            if (data[i] == target) {
                 return i;
             }
         }
         return -1;
     }
 
-    public static void printArray(int[] arr) {
-        for (int i = 0; i < arr.length; i++) {
+    public static void cetakArray(int[] data) {
+        for (int i = 0; i < data.length; i++) {
             if (i > 0) {
                 System.out.print(" ");
             }
-            System.out.print(arr[i]);
+            System.out.print(data[i]);
         }
         System.out.println();
     }
 
     public static void main(String[] args) {
-        Scanner input = new Scanner(Main.class.getResourceAsStream("branches.txt"));
+        Scanner baca = new Scanner(Main.class.getResourceAsStream("branches.txt"));
 
-        int n = input.nextInt();
-        int[] arr = new int[n];
-        for (int i = 0; i < n; i++) {
-            arr[i] = input.nextInt();
+        int jumlahCabang = baca.nextInt();
+        int[] stabilitas = new int[jumlahCabang];
+        for (int i = 0; i < jumlahCabang; i++) {
+            stabilitas[i] = baca.nextInt();
         }
 
-        int m = input.nextInt();
-        int[] targets = new int[m];
-        for (int i = 0; i < m; i++) {
-            targets[i] = input.nextInt();
+        int jumlahTarget = baca.nextInt();
+        int[] daftarTarget = new int[jumlahTarget];
+        for (int i = 0; i < jumlahTarget; i++) {
+            daftarTarget[i] = baca.nextInt();
         }
-        input.close();
+        
+        baca.close();
 
-        insertionSort(arr, 3);
-        printArray(arr);
+        insertionSort(stabilitas, 3);
+        cetakArray(stabilitas);
 
-        for (int i = 0; i < m; i++) {
-            int idx = linearSearch(arr, targets[i]);
+        for (int i = 0; i < jumlahTarget; i++) {
+            int posisi = linearSearch(stabilitas, daftarTarget[i]);
 
-            if (idx != -1) {
-                System.out.println(targets[i] + ": FOUND at index " + idx);
+            if (posisi != -1) {
+                System.out.println(daftarTarget[i] + ": FOUND at index " + posisi);
             } else {
-                System.out.println(targets[i] + ": NOT FOUND");
+                System.out.println(daftarTarget[i] + ": NOT FOUND");
             }
         }
     }
