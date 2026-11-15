@@ -111,12 +111,13 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        Scanner baca = new Scanner(Main.class.getResourceAsStream("campus.txt"));
         size = baca.nextInt();
         names = new String[size];
         for (int i = 0; i < size; i++) {
             names[i] = baca.next();
         }
-        
+
         graph = new int[size][size];
 
         int jumlahJalan = baca.nextInt();
