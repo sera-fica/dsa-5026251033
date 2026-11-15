@@ -3,105 +3,107 @@ package lw05.prelab;
 import java.util.*;
 
 public class Main {
-    static Scanner baca = new Scanner(Main.class.getResourceAsStream("campus.txt"));
-
     static int[][] graph;
-    static int jumlah;
-    static String[] nama;
+    static int size;
+    static String[] names;
 
+    // Adds a two-way walkway (complete, do not change)
     static void addEdge(int from, int to, int minutes) {
         graph[from][to] = minutes;
         graph[to][from] = minutes;
     }
 
-    static List<Integer> bfs(int awal) {
-        List<Integer> urutan = new ArrayList<>();
-        Set<Integer> dikunjungi = new HashSet<>();
-        Queue<Integer> antrean = new LinkedList<>();
-        antrean.add(awal);
-        dikunjungi.add(awal);
-        while (!antrean.isEmpty()) {
-            int sekarang = antrean.poll();
-            urutan.add(sekarang);
-            for (int tetangga = 0; tetangga < jumlah; tetangga++) {
-                if (graph[sekarang][tetangga] > 0 && !dikunjungi.contains(tetangga)) { 
-                    dikunjungi.add(tetangga);
-                    antrean.offer(tetangga); 
+    static List<Integer> bfs(int start) {
+        List<Integer> order = new ArrayList<>();
+        Set<Integer> visited = new HashSet<>();
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(start);
+        visited.add(start);
+        while (!queue.isEmpty()) {
+            int current = queue.poll();             // take the building at the front of the queue
+            order.add(current);
+            for (int next = 0; next < size; next++) {
+                if (graph[current][next] > 0 && !visited.contains(next)) {  // next is a neighbour that has not been visited
+                    visited.add(next);
+                    queue.add(next);                        // put next at the back of the queue
                 }
             }
         }
-        return urutan;
+        return order;
     }
 
-    static Set<Integer> dfsVisited = new HashSet<>(); 
-    static List<Integer> dfsOrder = new ArrayList<>(); 
+    static Set<Integer> dfsVisited = new HashSet<>();   // shared by every recursive call of dfs()
+    static List<Integer> dfsOrder = new ArrayList<>();  // shared by every recursive call of dfs()
 
-    static void dfs(int sekarang) {
-        dfsVisited.add(sekarang); 
-        dfsOrder.add(sekarang);
-        for (int tetangga = 0; tetangga < jumlah; tetangga++) {
-            if (graph[sekarang][tetangga] > 0 && !dfsVisited.contains(tetangga)) {
-                dfs(tetangga);
+    static void dfs(int current) {
+        dfsVisited.add(current);                                    // mark current as visited
+        dfsOrder.add(current);
+        for (int next = 0; next < size; next++) {
+            if (graph[current][next] > 0 && !dfsVisited.contains(next)) {
+                dfs(next);                            // go deeper from next
             }
         }
     }
 
-    static void dijkstraAlg(int awal, int tujuan) {
-        int[] jarak = new int[jumlah];
-        for (int i = 0; i < jumlah; i++) {
-            jarak[i] = 9999;
+    static void dijkstraAlg(int start, int dest) {
+        int[] dist = new int[size];
+        for (int i = 0; i < size; i++) {
+            dist[i] = Integer.MAX_VALUE;
         }
-        jarak[awal] = 0;
-        boolean[] dikunjungi = new boolean[jumlah];
-        int[] asal = new int[jumlah];
+        dist[start] = 0;
+        boolean[] visited = new boolean[size];
+        int[] prev = new int[size];
 
-        for (int i = 0; i < jumlah; i++) {
-            int sekarang = findTheNextNode(dikunjungi, jarak);
-            dikunjungi[sekarang] = true;
-            for (int tetangga = 0; tetangga < jumlah; tetangga++) {
-                int jarakBaru = jarak[sekarang] + graph[sekarang][tetangga];
-                if (graph[sekarang][tetangga] > 0 && jarakBaru < jarak[tetangga]) { 
-                    jarak[tetangga] = jarakBaru;
-                    asal[tetangga] = sekarang; 
+        for (int i = 0; i < size; i++) {
+            int current = findTheNextNode(visited, dist);
+            visited[current] = true;                                // mark current as visited
+            for (int next = 0; next < size; next++) {
+                int newDist = dist[current] + graph[current][next];
+                if (graph[current][next] > 0 && !visited[next] && newDist < dist[next]) {   // the new distance is shorter
+                    dist[next] = newDist;
+                    prev[next] = current;                        // remember that next is reached from current
                 }
             }
         }
 
-        System.out.println("=== Shortest Time from " + nama[awal] + " ===");
-        for (int i = 0; i < jumlah; i++) {
-            System.out.println(nama[i] + " : " + jarak[i] + " min");
+        System.out.println("=== Shortest Time from " + names[start] + " ===");
+        for (int i = 0; i < size; i++) {
+            System.out.println(names[i] + " : " + dist[i] + " min");
         }
-        System.out.println("=== Shortest Route from " + nama[awal] + " to " + nama[tujuan] + " ===");
-        route(tujuan, awal, asal);
+        System.out.println("=== Shortest Route from " + names[start] + " to " + names[dest] + " ===");
+        route(dest, start, prev);
         System.out.println();
-        System.out.println("Total time: " + jarak[tujuan] + " min");
+        System.out.println("Total time: " + dist[dest] + " min");
     }
 
-    static int findTheNextNode(boolean[] dikunjungi, int[] jarak) {
-        int terkecil = 9999;
-        int terdekat = -1;
-        for (int i = 0; i < jumlah; i++) {
-            if (!dikunjungi[i] && jarak[i] < terkecil) { 
-                terkecil = jarak[i];
-                terdekat = i;
+    // Helper of dijkstraAlg(): finds the unvisited building with the smallest distance
+    static int findTheNextNode(boolean[] visited, int[] dist) {
+        int min = Integer.MAX_VALUE;
+        int closest = -1;
+        for (int i = 0; i < size; i++) {
+            if (!visited[i] && dist[i] < min) {          // i is unvisited and closer than min
+                min = dist[i];
+                closest = i;
             }
         }
-        return terdekat;
+        return closest;
     }
 
-    static void route(int sekarang, int awal, int[] asal) {
-        if (sekarang == awal) {
-            System.out.print(nama[sekarang]);
+    // Helper of dijkstraAlg(): prints the route from start to current
+    static void route(int current, int start, int[] prev) {
+        if (current == start) {
+            System.out.print(names[current]);
         } else {
-            route(asal[sekarang], awal, asal); 
-            System.out.print(" -> " + nama[sekarang]);
+            route(prev[current], start, prev);                                // print the route up to the previous building
+            System.out.print(" -> " + names[current]);
         }
     }
 
-    static void printPath(List<Integer> daftar) {
-        for (int i = 0; i < daftar.size(); i++) {
-            System.out.print(nama[daftar.get(i)]);
-            if (i < daftar.size() - 1) {
+    // Prints the buildings as A -> B -> C (complete, do not change)
+    static void printPath(List<Integer> list) {
+        for (int i = 0; i < list.size(); i++) {
+            System.out.print(names[list.get(i)]);
+            if (i < list.size() - 1) {
                 System.out.print(" -> ");
             }
         }
@@ -109,29 +111,30 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        jumlah = baca.nextInt();
-        nama = new String[jumlah];
-        for (int i = 0; i < jumlah; i++) {
-            nama[i] = baca.next();
+        size = baca.nextInt();
+        names = new String[size];
+        for (int i = 0; i < size; i++) {
+            names[i] = baca.next();
         }
-        graph = new int[jumlah][jumlah];
+        
+        graph = new int[size][size];
 
         int jumlahJalan = baca.nextInt();
         for (int i = 0; i < jumlahJalan; i++) {
-            int from = baca.nextInt();
-            int to = baca.nextInt();
-            int minutes = baca.nextInt();
-            addEdge(from, to, minutes);
+            int dari = baca.nextInt();
+            int ke = baca.nextInt();
+            int menit = baca.nextInt();
+            addEdge(dari, ke, menit);
         }
 
         int awal = baca.nextInt();
         int tujuan = baca.nextInt();
         baca.close();
 
-        System.out.println("=== BFS from " + nama[awal] + " ===");
+        System.out.println("=== BFS from " + names[awal] + " ===");
         printPath(bfs(awal));
 
-        System.out.println("=== DFS from " + nama[awal] + " ===");
+        System.out.println("=== DFS from " + names[awal] + " ===");
         dfs(awal);
         printPath(dfsOrder);
 
